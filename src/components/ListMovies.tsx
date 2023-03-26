@@ -1,13 +1,17 @@
-import hasMovies from '../mockups/hasMovies.json';
+import { Movie } from '../interfaces/interface';
 import { MovieCard } from "./MovieCard";
 
-export const ListMovies = () => {
+interface Props {
+	movies: Movie[];
+}
+
+export const ListMovies = ( { movies }: Props ) => {
 	return (
 		<>
 			{
-				hasMovies.Search?.length > 0 
+				movies.length > 0 
 				?
-					hasMovies.Search.map( (movie) => (
+					movies.map((movie) => (
 						<MovieCard key={movie.imdbID} movie={movie} />
 					))
 				: 

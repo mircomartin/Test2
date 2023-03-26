@@ -1,12 +1,11 @@
-import { useState } from 'react';
 import { ListMovies } from "./components/ListMovies";
+import { useMovie } from "./hooks/useMovie";
 import { useSearch } from "./hooks/useSearch";
-import { Movie } from "./interfaces/interface";
 
 function App() {
 
-  const [movies, setMovies] = useState<Movie[] | []>([]);
-  const { query, setQuery, error } = useSearch()
+  const { query, setQuery, error } = useSearch();
+  const { getMovies, movies } = useMovie();
 
   const handleChange = ( e: React.ChangeEvent<HTMLInputElement> ) => {
     setQuery( e.target.value );
@@ -14,7 +13,7 @@ function App() {
 
   const handleSubmit = ( e: React.FormEvent<HTMLFormElement> ) => {
     e.preventDefault();
-    console.log(query)
+    getMovies(query)
   }
 
   return (
@@ -27,14 +26,14 @@ function App() {
           <input name="query" value={ query } onChange={ handleChange } type="text" placeholder="Avengers, Batman, Notebook..."/>
           <button type="submit">Search</button>
         </form>
-        {
-          error && <p>{error}</p>
-        }
 
+        {
+          error && <p style={{ color: 'red', border: '1px solid red', padding: '5px 10px', borderRadius: 6 }}>{error}</p>
+        }
       </header>
 
       <main>
-        <ListMovies />
+        <ListMovies movies={ movies } />
       </main>
 
     </div>
