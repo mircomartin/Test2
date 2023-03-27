@@ -9,7 +9,7 @@ export const ListMovies = ( { movies }: Props ) => {
 	return (
 		<>
 			{
-				movies.length > 0 
+				movies?.length > 0 
 				?
 					movies.map((movie) => (
 						<MovieCard key={movie.imdbID} movie={movie} />

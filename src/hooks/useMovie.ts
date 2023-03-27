@@ -1,30 +1,42 @@
-import { useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Movie } from "../interfaces/interface";
+import { searchMovies } from "../services/movies";
 
-const ENDPOINT_MOVIE = 'https://www.omdbapi.com/?apikey=e2933a1b&s='
 
-export const useMovie = () => {
+export const useMovie = ( { query, sort }: { query: string, sort: boolean } ) => {
 
   const [movies, setMovies] = useState<Movie[] | []>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const getMovies = async ( query: string ) => {
+  const previousSearch = useRef(query);
+
+  const getMovies = useCallback( async ( { query }: { query: string } ) => {
+
+    if( query === previousSearch.current ) return;
 
     try {
+      setLoading(true)    
+      previousSearch.current = query;  
+      const movies = await searchMovies( { query } )
+      setMovies(movies)
 
-      const response = await fetch(`${ENDPOINT_MOVIE}${query}`);
-      const { Search } = await response.json();
-      setMovies(Search)
-      
-    } catch (error) {
-
-      console.log(error)
-      
+    } catch ( error: any ) {
+      setError( error.message )
+    } finally {
+      setLoading(false)      
     }
 
-  }
+  }, [])
+
+  const sortedMovies = useMemo(() => {
+    return sort ? [...movies]?.sort((a, b) => a.Title.localeCompare(b.Title)) : movies
+  }, [sort, movies])
 
   return {
     getMovies,
-    movies
+    movies: sortedMovies,
+    loading,
+    error
   }
 }
